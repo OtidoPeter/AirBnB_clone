@@ -1,20 +1,15 @@
 #!/usr/bin/python3
-"""Contains User class
+"""user class
 """
 
-
 from models.base_model import BaseModel
+import json
 
 
 class User(BaseModel):
-    """Inherits from BaseModel
-    """
-    email = str()
-    password = str()
-    first_name = str()
-    last_name = str()
+    '''base model class'''
 
-    def __init__(self, *args, **kwargs):
-        """User class constructor
-        """
-        super().__init__(*args, **kwargs)
+    email = ""
+    password = ""
+    first_name = ""
+    last_name = ""

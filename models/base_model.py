@@ -1,74 +1,75 @@
 #!/usr/bin/python3
-"""Contains the BaseModel class
+from datetime import datetime
+from uuid import uuid4
+import models
+
+"""
+Module BaseModel
+Parent of all classes
 """
 
 
-import models
-import uuid
-from datetime import datetime
-
-
-formated_time = "%Y-%m-%dT%H:%M:%S.%f"
-now = datetime.now()
-
-
-class BaseModel:
-    """Defines all common attributes/methods for other classes
+class BaseModel():
+    """Base class for Airbnb clone project
+    Methods:
+        __init__(self, *args, **kwargs)
+        __str__(self)
+        __save(self)
+        __repr__(self)
+        to_dict(self)
     """
+
     def __init__(self, *args, **kwargs):
-        """BaseModel Class Constructor
+        """
+        Initialize attributes: random uuid, dates created/updated
         """
         if kwargs:
-            for k, v in kwargs.items():
-                if v is not self.__class__.__name__:
-                    self.__dict__[k] = v
-            if hasattr(self, "created_at") and type(self.created_at) is str:
-                self.created_at = datetime.strptime(
-                    kwargs["created_at"], formated_time
-                )
-
-            if hasattr(self, "updated_at") and type(self.updated_at) is str:
-                self.updated_at = datetime.strptime(
-                    kwargs["updated_at"], formated_time
-                )
-
+            for key, val in kwargs.items():
+                if "created_at" == key:
+                    self.created_at = datetime.strptime(kwargs["created_at"],
+                                                        "%Y-%m-%dT%H:%M:%S.%f")
+                elif "updated_at" == key:
+                    self.updated_at = datetime.strptime(kwargs["updated_at"],
+                                                        "%Y-%m-%dT%H:%M:%S.%f")
+                elif "__class__" == key:
+                    pass
+                else:
+                    setattr(self, key, val)
         else:
-            id = uuid.uuid4()
-            self.id = str(id)
-            self.created_at = now
-            self.updated_at = self.created_at
+            self.id = str(uuid4())
+            self.created_at = datetime.now()
+            self.updated_at = datetime.now()
             models.storage.new(self)
-            models.storage.save()
 
     def __str__(self):
-        """Returns a neatly formated string representation
         """
-        str_repr = "[{:s}] ({:s}) {}".format(
-                                        self.__class__.__name__,
-                                        self.id, self.__dict__)
-        return str_repr
+        Return string of info about model
+        """
+        return ('[{}] ({}) {}'.
+                format(self.__class__.__name__, self.id, self.__dict__))
+
+    def __repr__(self):
+        """
+        returns string representation
+        """
+        return (self.__str__())
 
     def save(self):
-        """Updates the public instance attribute updated_at\
-            with the current datetime
         """
-        self.updated_at = now
+        Update instance with updated time & save to serialized file
+        """
+        self.updated_at = datetime.now()
         models.storage.save()
 
     def to_dict(self):
-        """ returns a dictionary containing all keys/values\
-            of __dict__ of the instance
         """
-        my_dict = self.__dict__.copy()
-        if "created_at" in my_dict:
-            my_dict["created_at"] = my_dict["created_at"].strftime(
-                formated_time
-            )
-
-        if "updated_at" in my_dict:
-            my_dict["updated_at"] = my_dict["updated_at"].strftime(
-                formated_time
-            )
-
-        my_dict["__class__"] = self.__class__.__name__
-        return (my_dict)
+        Return dic with string formats of times; add class info to dic
+        """
+        dic = {}
+        dic["__class__"] = self.__class__.__name__
+        for k, v in self.__dict__.items():
+            if isinstance(v, (datetime, )):
+                dic[k] = v.isoformat()
+            else:
+                dic[k] = v
+        return dic

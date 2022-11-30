@@ -1,18 +1,16 @@
 #!/usr/bin/python3
-"""Contains the City class
 """
-
-
+Module City class
+"""
 from models.base_model import BaseModel
 
 
 class City(BaseModel):
-    """Inherits from BaseModel
     """
-    state_id = str()
-    name = str()
-
-    def __init__(self, *args, **kwargs):
-        """City class constructor
-        """
-        super().__init__(*args, **kwargs)
+    Inherits from BaseModel
+    Public class attributes:
+        state_id: (str) will be State.id
+        name:     (str)
+    """
+    state_id = ""
+    name = ""
